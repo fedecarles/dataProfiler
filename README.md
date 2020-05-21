@@ -12,7 +12,7 @@
 
 ### Interactive dashboards
 
-A quick and easy way to create interactive dashboard offline. Powered by D3.js
+A quick and easy way to create interactive dashboards offline. Powered by D3.js
 and Crossfilter.js
 
 ## Requirements and dependencies
@@ -26,7 +26,7 @@ and Crossfilter.js
 
 #### Python
 * pandas
-* eel [eel](https://github.com/samuelhwilliams/Eel)
+* [eel](https://github.com/samuelhwilliams/Eel)
 
 ## Current features
 
