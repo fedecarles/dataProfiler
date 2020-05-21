@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang=en >
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <title>profiler</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://unpkg.com/dc@4/dist/style/dc.css">
+    </head>
+
+    <script type="text/javascript" src="/eel.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://unpkg.com/dc@4/dist/dc.js"></script>
+    <script src="https://cdn.tutorialjinni.com/crossfilter2/1.5.2/crossfilter.min.js"></script>
+    <script type="text/javascript" src="profiler.js" charset="utf-8"></script>
+
+    <body>
+        <nav class="navbar">
+            <div class="navbar:">
+                <button id="load-data" class="btn btn-secondary btn-sm" type="button" onClick="get_data_btn()">Load Data</button>
+                <button id="add-chart" class="btn btn-secondary btn-sm" type="button">Add Chart</button>
+                <button id="add-title" class="btn btn-secondary btn-sm" type="button" data-toggle='modal' data-target='#title-modal'>Add Title</button>
+            </div>
+        </nav>
+
+        <h3 id="dash_title"></h3>
+
+        <div class="container-fluid">
+            <div class="chart-row row m-1">
+            </div>
+        </div>
+    </body>
+
+    <!--Modal Chart Config -->
+    <div class="modal fade" id="config-modal" tabindex="-1" role="dialog" aria-labelledby="configModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="configModalLongTitle">Chart Config</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body form-horizontal"> 
+                    <span id="passed-id"></span>
+                    <div class="form-group">
+                        <label for="config1">Dimension:</label>
+                        <select id="config1" class="chart-dimension form-control"> </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="config2">Group:</label>
+                        <select id="config2" class="chart-group form-control"> </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="config3">Type:</label>
+                        <select id="config3" class="chart-type form-control">
+                            <option id="bar">Bar</option>
+                            <option id="row">Row</option>
+                            <option id="line">Line - Time</option>
+                            <option id="line">Line - Ordinal</option>
+                            <option id="pie">Pie</option>
+                            <option id="table">Table</option>
+                            <option id="table">Box Plot</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="config4">Aggregation:</label>
+                        <select id="config4" class="chart-agg form-control">
+                            <option id="sum">Sum</option>
+                            <option id="count">Count</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="config5">Width:</label>
+                        <input type="text" class="chart-width form-control" value="450"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="config6">Height:</label>
+                        <input type="text" class="chart-height form-control" value="400"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="config7">Color:</label>
+                        <select id="config7" class="chart-color form-control">
+                            <option id="blue" value="#29B6F6">Blue</option>
+                            <option id="red" value="#ef5350">Red</option>
+                            <option id="green" value="#66BB6A">Green</option>
+                            <option id="yellow" value="#FFEE58">Yellow</option>
+                            <option id="grey" value="#424242">Grey</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="config8">Title:</label>
+                        <input type="text" class="chart-title form-control" value=""/>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button id="save-chart" type="button" class="btn btn-primary">Save</button> </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Chart Config -->
+    <div class="modal fade" id="title-modal" tabindex="-1" role="dialog" aria-labelledby="titleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="titleModalLongTitle">Dashboard Title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body form-horizontal"> 
+                    <input type="text" id="dash-text" class="form-control" value=""/>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button id="save-title" type="button" class="btn btn-primary">Save</button> </div>
+            </div>
+        </div>
+    </div>
+
+</html>
+<style type="text/css" media="all">
+body {
+    background-color: #efefef: 
+    padding: 1%;
+}
+.chart-area {
+    border: solid 0.5px #e0dada;
+}
+g .x.axis text {
+    text-anchor: end !important;
+    transform: rotate(-45deg);
+}
+g .axis text {
+    text-anchor: end !important;
+    transform: rotate(-45deg);
+}
+
+.dc-chart g.row text {
+    fill: black;
+    color: black;
+}
+.dc-chart .pie-slice {
+    fill: black;
+    color: black;
+}
+.dc-chart tbody {
+    border: solid 1px;
+}
+#close {
+    float:right;
+    display: inline-block;
+    padding: 2px 5px;
+}
+.close:hover {
+    cursor: pointer;
+}
+#dash_title {
+    text-align: center;
+}
+
+    
+</style>
