@@ -124,6 +124,8 @@ function createChart(type, uid, dim, group, agg, color, width, height) {
                      function(d) {return d.key;},
                      function(d) {return d.value;}
                     ])
+            .renderlet(function (table) {
+                       table.selectAll('tbody').classed('table table-sm', true);})
             .order(d3.descending);
         tableChart.render()
     } 
