@@ -19,14 +19,13 @@
     <body>
         <nav class="navbar">
             <div class="navbar:">
-                <button id="load-data" class="btn btn-secondary btn-sm" type="button" onClick="get_data_btn()">Load Data</button>
-                <button id="add-chart" class="btn btn-secondary btn-sm" type="button">Add Chart</button>
-                <button id="add-title" class="btn btn-secondary btn-sm" type="button" data-toggle='modal' data-target='#title-modal'>Add Title</button>
+                <button id="load-data" class="btn btn-secondary btn-sm" type="button" onClick="get_data_btn()">Quick Data Load</button>
+                <button id="add-data2" class="btn btn-secondary btn-sm" type="button" data-toggle='modal' data-target='#data-modal'>Advanced Data Load</button>
+                <button id="add-chart" class="btn btn-secondary btn-sm" type="button">Add Chart Element </button>
+                <button id="add-title" class="btn btn-secondary btn-sm" type="button" data-toggle='modal' data-target='#title-modal'>Add Dashboard Title</button>
             </div>
         </nav>
-
         <h3 id="dash_title"></h3>
-
         <div class="container-fluid">
             <div class="chart-row row m-1">
             </div>
@@ -118,6 +117,43 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button id="save-title" type="button" class="btn btn-primary">Save</button> </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Data Load-->
+    <div class="modal fade" id="data-modal" tabindex="-1" role="dialog" aria-labelledby="configModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="configModalData">Data Load</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body form-horizontal"> 
+                    <div class="form-group">
+                        <button id="data-path1" class="btn btn-secondary btn-sm" type="button" onClick="load_data1_btn()">Dataset 1</button>
+                    </div>
+                    <div class="form-group">
+                        <select multiple id="data-select1" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <button id="data-path2" class="btn btn-secondary btn-sm" type="button" onClick="load_data2_btn()">Dataset 2</button>
+                    </div>
+                    <div class="form-group">
+                        <select multiple id="data-select2" class="form-control"> </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="config8">Merge on:</label>
+                        <select id="merge-select" class="form-control">
+                            <option>None</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button id="load-merge" type="button" class="btn btn-primary" onClick="load_merge_btn()" data-dismiss="modal">Load & Merge</button> </div>
             </div>
         </div>
     </div>

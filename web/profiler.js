@@ -14,7 +14,45 @@ async function get_data_btn() {
         $(".chart-group").append($('<option></option>').val(key).html(key));    
            
     });
-    return data
+} 
+
+async function load_data1_btn() {
+    data1 = await eel.load_data()();
+
+    $("#data-select1").empty();
+    $("#data-path1").empty().html(data1[1]);
+
+    $.each(data1[0], function(key, value){
+        $("#data-select1").append($('<option></option>').val(value).html(value));    
+    });
+} 
+
+async function load_data2_btn() {
+    data2 = await eel.load_data()();
+
+    $("#data-select2").empty();
+    $("#data-path2").empty().html(data2[1]);
+
+    $.each(data2[0], function(key, value){
+        $("#data-select2").append($('<option></option>').val(value).html(value));    
+        $("#merge-select").append($('<option></option>').val(value).html(value));    
+    });
+} 
+
+async function load_merge_btn() {
+    var file1 = $("#data-path1").text();
+    var file2 = $("#data-path2").text();
+    var cols1 = $("#data-select1").val();
+    var cols2 = $("#data-select2").val();
+    var pk = $("#merge-select").val();
+    data = await eel.load_merge(file1, file2, cols1, cols2, pk)();
+    ndx = crossfilter(data);
+    all = ndx.groupAll();
+
+    $.each(data[0], function(key, value){
+        $(".chart-dimension").append($('<option></option>').val(key).html(key));    
+        $(".chart-group").append($('<option></option>').val(key).html(key));    
+    });
 } 
 
 function createChart(type, uid, dim, group, agg, color, width, height) {
