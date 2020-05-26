@@ -35,6 +35,7 @@ and Crossfilter.js
 * Line charts (ordinal & time)
 * Pie charts
 * Tables
+* Allows to load and join two different csv files for comparison.
 
 ## Usage
 
