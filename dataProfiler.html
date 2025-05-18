@@ -1,0 +1,712 @@
+<!DOCTYPE html//>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <title>
+   profiler
+  </title>
+  <!-- Bootstrap 5 CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://unpkg.com/dc@4/dist/style/dc.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+ </head>
+ <body>
+  <!-- Sidebar -->
+  <div class="d-flex">
+   <div class="bg-light d-flex flex-column p-3" style="min-height: 100vh;">
+    <input accept=".csv" id="file-input" style="display:none" type="file"/>
+    <!-- Load CSV -->
+    <button class="btn btn-light mb-3" id="load-data" title="Load Data">
+     <i class="bi bi-filetype-csv fs-4">
+     </i>
+    </button>
+    <!-- Add Title -->
+    <button class="btn btn-light mb-3" data-bs-target="#title-modal" data-bs-toggle="modal" id="add-title" title="Add Dashboard Title">
+     <i class="bi bi-fonts fs-4">
+     </i>
+    </button>
+    <!-- Add Chart -->
+    <button class="btn btn-light mb-3" id="add-chart" title="Add Chart Element">
+     <i class="bi bi-plus-lg fs-4">
+     </i>
+    </button>
+    <!-- Export Dashboard -->
+    <button class="btn btn-light mb-3" id="export-dashboard" title="Export Dashboard">
+     <i class="bi bi-download fs-4">
+     </i>
+    </button>
+   </div>
+   <!-- Main content -->
+   <div class="flex-grow-1 p-3">
+    <h3 class="text-center mb-4" id="dash_title">
+    </h3>
+    <div class="container-fluid">
+     <div class="chart-row row m-1">
+     </div>
+    </div>
+   </div>
+  </div>
+  <!-- Config Chart Modal -->
+  <div aria-hidden="true" aria-labelledby="configModalLongTitle" class="modal fade" id="config-modal" tabindex="-1">
+   <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-3 shadow-lg">
+     <div class="modal-header">
+      <h5 class="modal-title">
+       Chart Configuration
+      </h5>
+      <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button">
+      </button>
+     </div>
+     <div class="modal-body">
+      <span class="d-none" id="passed-id">
+      </span>
+      <div class="row g-3">
+       <div class="col-6">
+        <label class="form-label" for="config1">
+         Dimension
+        </label>
+        <select class="chart-dimension form-select" id="config1">
+        </select>
+       </div>
+       <div class="col-6">
+        <label class="form-label" for="config2">
+         Measure
+        </label>
+        <select class="chart-group form-select" id="config2">
+        </select>
+       </div>
+       <div class="col-12">
+        <label class="form-label">
+         Chart Type
+        </label>
+        <div class="btn-group w-100" id="config3" role="group">
+         <button class="btn btn-outline-primary chart-type" data-type="bar" type="button">
+          Bar
+         </button>
+         <button class="btn btn-outline-primary chart-type" data-type="row" type="button">
+          Row
+         </button>
+         <button class="btn btn-outline-primary chart-type" data-type="line-time" type="button">
+          Line (Time)
+         </button>
+         <button class="btn btn-outline-primary chart-type" data-type="line-ordinal" type="button">
+          Line (Ordinal)
+         </button>
+         <button class="btn btn-outline-primary chart-type" data-type="pie" type="button">
+          Pie
+         </button>
+         <button class="btn btn-outline-primary chart-type" data-type="table" type="button">
+          Table
+         </button>
+        </div>
+       </div>
+       <div class="col-12">
+        <label class="form-label">
+         Aggregation
+        </label>
+        <div class="btn-group w-100" id="config4" role="group">
+         <button class="btn btn-outline-secondary chart-agg" data-agg="sum" type="button">
+          Sum
+         </button>
+         <button class="btn btn-outline-secondary chart-agg" data-agg="count" type="button">
+          Count
+         </button>
+         <button class="btn btn-outline-secondary chart-agg" data-agg="avg" type="button">
+          Average
+         </button>
+        </div>
+       </div>
+       <div class="col-6">
+        <label class="form-label" for="config5">
+         Width
+        </label>
+        <input class="form-range chart-width" id="config5" max="1900" min="200" step="50" type="range" value="450"/>
+       </div>
+       <div class="col-6">
+        <label class="form-label" for="config6">
+         Height
+        </label>
+        <input class="form-range chart-height" id="config6" max="1900" min="200" step="50" type="range" value="400"/>
+       </div>
+       <div class="col-6">
+        <label class="form-label" for="config7">
+         Color
+        </label>
+        <input class="form-control form-control-color chart-color" id="config7" title="Choose chart color" type="color" value="#29B6F6"/>
+       </div>
+       <div class="col-6">
+        <label class="form-label" for="config8">
+         Title
+        </label>
+        <input class="form-control chart-title" id="config8" placeholder="Chart Title" type="text"/>
+       </div>
+      </div>
+     </div>
+     <div class="modal-footer">
+      <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">
+       Close
+      </button>
+      <button class="btn btn-primary" id="save-chart" type="button">
+       Save
+      </button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <!-- Title Modal -->
+  <div aria-hidden="true" aria-labelledby="titleModalLongTitle" class="modal fade" id="title-modal" tabindex="-1">
+   <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+     <div class="modal-header">
+      <h5 class="modal-title">
+       Dashboard Title
+      </h5>
+      <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button">
+      </button>
+     </div>
+     <div class="modal-body">
+      <input class="form-control" id="dash-text" type="text" value="">
+      </input>
+     </div>
+     <div class="modal-footer">
+      <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">
+       Close
+      </button>
+      <button class="btn btn-primary" id="save-title" type="button">
+       Save
+      </button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js">
+  </script>
+  <script src="https://d3js.org/d3.v5.min.js">
+  </script>
+  <script src="https://unpkg.com/dc@4/dist/dc.js">
+  </script>
+  <script src="https://cdn.tutorialjinni.com/crossfilter2/1.5.2/crossfilter.min.js">
+  </script>
+  <style>
+   body {
+            background-color: #efefef;
+            margin: 0;
+        }
+        g .x.axis text,
+        g .axis text {
+            text-anchor: end !important;
+            transform: rotate(-45deg);
+        }
+        .dc-chart g.row rect {
+            width: revert-layer !important;
+            max-width: none !important;
+            flex-shrink: 1 !important;
+        }
+        .dc-chart g.row text,
+        .dc-chart .pie-slice {
+            fill: black;
+            color: black;
+        }
+        .dc-chart tbody {
+            border: solid 1px;
+        }
+        #close {
+            float: right;
+            display: inline-block;
+            padding: 2px 5px;
+        }
+        .close:hover {
+            cursor: pointer;
+        }
+        #dash_title {
+            text-align: center;
+        }
+  </style>
+  <script>
+   let data = [];
+        let ndx, all;
+        
+        function createChart(type, uid, dim, group, agg, color, width, height) {
+
+            const Dim = ndx.dimension(d => d[dim]);
+
+            const Group = (agg === "sum")
+              ? Dim.group().reduceSum(d => +d[group])
+              : (agg === "count")
+              ? Dim.group().reduceCount()
+              : (agg === "avg")
+              ? Dim.group().reduce(
+                  function(p, v) {
+                    ++p.count;
+                    p.total += +v[group];
+                    p.avg = p.total / p.count;
+                    return p;
+                  },
+                  function(p, v) {
+                    --p.count;
+                    p.total -= +v[group];
+                    p.avg = p.count === 0 ? 0 : p.total / p.count;
+                    return p;
+                  },
+                  function() {
+                    return { count: 0, total: 0, avg: 0 };
+                  }
+                )
+              : null;
+        
+            const nonEmptyGroup = remove_empty_bins(Group);
+        
+            const commonSettings = chart =>
+                chart
+                    .width(width)
+                    .height(height)
+                    .dimension(Dim)
+                    .group(nonEmptyGroup).valueAccessor(d => (agg === "avg" ? d.value.avg : d.value))
+                    .colors(color)
+                    .margins({ top: 10, left: 50, right: 50, bottom: 50 });
+        
+            let chart; // capture the chart to call render on
+        
+            switch (type) {
+                case "bar":
+                    chart = commonSettings(dc.barChart(uid))
+                        .x(d3.scaleBand())
+                        .xUnits(dc.units.ordinal)
+                        .brushOn(true)
+                        .elasticX(true)
+                        .elasticY(true)
+                        .xAxisLabel(dim)
+                        .yAxisLabel(group);
+                    chart.xAxis().ticks(10);
+                    chart.render();
+                    break;
+        
+                case "row":
+                    chart = commonSettings(dc.rowChart(uid))
+                        .elasticX(true)
+                        .cap(10)
+                        .ordering(d => -d.value);
+                    chart.xAxis().ticks(10);
+                    chart.render();
+                    break;
+        
+                case "line-ordinal":
+                    chart = commonSettings(dc.lineChart(uid))
+                        .x(d3.scaleBand())
+                        .xUnits(dc.units.ordinal)
+                        .xAxisLabel(dim)
+                        .yAxisLabel(group);
+                    chart.xAxis().ticks(10);
+                    chart.render();
+                    break;
+        
+                case "line-time":
+                    const parseTime = d3.timeParse("%Y-%m-%d");
+                    data.forEach(d => { d.__parsedDate__ = parseTime(d[dim]); });
+        
+                    const dateDim = ndx.dimension(d => d.__parsedDate__);
+                    const dateGroup = (agg === "sum")
+                        ? dateDim.group().reduceSum(d => +d[group])
+                        : dateDim.group().reduceCount();
+        
+                    const nonEmptyDateGroup = remove_empty_bins(dateGroup);
+                    const minDate = dateDim.bottom(1)[0].__parsedDate__;
+                    const maxDate = dateDim.top(1)[0].__parsedDate__;
+        
+                    chart = dc.lineChart(uid)
+                        .width(width)
+                        .height(height)
+                        .x(d3.scaleTime().domain([minDate, maxDate]))
+                        .dimension(dateDim)
+                        .group(nonEmptyDateGroup)
+                        .colors(color)
+                        .elasticY(true)
+                        .xAxisLabel(dim)
+                        .yAxisLabel(group)
+                        .margins({ top: 10, left: 50, right: 50, bottom: 50 });
+                    chart.xAxis().ticks(10);
+                    chart.render();
+                    break;
+        
+                case "pie":
+                    chart = dc.pieChart(uid)
+                        .width(width)
+                        .height(height)
+                        .slicesCap(10)
+                        .innerRadius(100)
+                        .dimension(Dim)
+                        .group(nonEmptyGroup).valueAccessor(d => (agg === "avg" ? d.value.avg : d.value))
+                        .on("pretransition", chart => {
+                            chart.selectAll("text.pie-slice").text(d =>
+                                `${d.data.key} ${dc.utils.printSingleValue(((d.endAngle - d.startAngle) / (2 * Math.PI)) * 100)}%`
+                            );
+                        });
+                    chart.render();
+                    break;
+        
+                case "table":
+                    chart = dc.dataTable(uid)
+                        .dimension(Group)
+                        .group(() => "")
+                        .size(100)
+                        .columns([d => d.key, d => d.value])
+                        .order(d3.descending)
+                        .renderlet(table => {
+                            table.selectAll("tbody").classed("table table-sm", true);
+                        });
+                    chart.render();
+                    break;
+        
+                default:
+                    console.warn(`Unknown chart type: ${type}`);
+            }
+        }
+      
+
+        function remove_empty_bins(source_group) {
+            return {
+                all: () => source_group.all().filter(d => d.value != null && d.value !== 0)
+            };
+        }
+
+        
+        document.addEventListener("DOMContentLoaded", function() {
+        
+            document.getElementById("load-data").addEventListener("click", function() {
+                document.getElementById("file-input").click();
+            });
+        
+            document.getElementById("file-input").addEventListener("change", function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    Papa.parse(file, {
+                        header: true,
+                        dynamicTyping: true,
+                        skipEmptyLines: true,
+                        complete: function(results) {
+                            data = results.data;
+                            ndx = crossfilter(data);
+                            all = ndx.groupAll();
+        
+                            const dimSelect = document.querySelectorAll(".chart-dimension");
+                            const groupSelect = document.querySelectorAll(".chart-group");
+        
+                            dimSelect.forEach(select => select.innerHTML = "");
+                            groupSelect.forEach(select => select.innerHTML = "");
+        
+                            Object.keys(data[0]).forEach(function(key) {
+                                dimSelect.forEach(select => {
+                                    const option = document.createElement("option");
+                                    option.value = key;
+                                    option.textContent = key;
+                                    select.appendChild(option);
+                                });
+                                groupSelect.forEach(select => {
+                                    const option = document.createElement("option");
+                                    option.value = key;
+                                    option.textContent = key;
+                                    select.appendChild(option);
+                                });
+                            });
+        
+                            //data = null;
+                        }
+                    });
+                }
+            });
+        
+            let chartNum = 0;
+        
+            document.getElementById("add-chart").addEventListener("click", function() {
+                chartNum++;
+                const chartRow = document.querySelector(".chart-row");
+                const chartDiv = document.createElement("div");
+                chartDiv.className = "chart-area col-auto m-1";
+                chartDiv.id = "chart";
+                chartDiv.innerHTML = `
+                    <div class="card border shadow-sm" style="width: ${450}px;">
+                        <div id="card${chartNum}" class="card-header d-flex justify-content-between align-items-center p-2">
+                            <button class="config-btn btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#config-modal" title="Configure">
+                                <i class="bi bi-gear-fill"></i>
+                            </button>
+                            <h5 class='title${chartNum} text-center mt-2'></h5>
+                            <button class="close btn btn-sm btn-light" title="Close">&times;</button>
+                        </div>
+                        <div class="card-body p-2">
+                            <div id="chart${chartNum}"></div>
+                        </div>
+                    </div>
+                    `;
+        
+                chartRow.appendChild(chartDiv);
+        
+                chartDiv.querySelector(".config-btn").addEventListener("click", function() {
+                    const uid = this.parentElement.parentElement.children[1].children[0].id;
+                    document.getElementById("passed-id").textContent = uid;
+                });
+        
+                // Add close button behavior
+                const closeBtn = chartDiv.querySelector('.close');
+                closeBtn.addEventListener('click', () => {
+                    chartDiv.remove();
+                });
+        
+                // Chart Type and Aggregation button toggles
+                document.querySelectorAll('.chart-type').forEach(btn => { btn.addEventListener('click', () => {
+                    document.querySelectorAll('.chart-type').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                  });
+                });
+                
+                document.querySelectorAll('.chart-agg').forEach(btn => {
+                  btn.addEventListener('click', () => {
+                    document.querySelectorAll('.chart-agg').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                  });
+                });
+        
+            });
+        
+        
+            document.getElementById("save-title").addEventListener("click", function() {
+                const text = document.getElementById("dash-text").value;
+                document.getElementById("dash_title").textContent = text;
+            });
+        
+            document.getElementById("save-chart").addEventListener("click", function() {
+                if (!ndx) {
+                    alert("Data not loaded yet. Please load a CSV file first.");
+                    return;
+                }
+                const container = this.closest(".modal-content");
+        
+                const uid = document.getElementById("passed-id").textContent;
+                const dim = container.querySelector(".chart-dimension").value;
+                const group = container.querySelector(".chart-group").value;
+                const type = container.querySelector(".chart-type.active")?.dataset.type;
+                const agg = container.querySelector(".chart-agg.active")?.dataset.agg;
+                const width = +container.querySelector(".chart-width").value;
+                const height = +container.querySelector(".chart-height").value;
+                const color = container.querySelector(".chart-color").value;
+                const title = container.querySelector(".chart-title").value;
+        
+                const chartHeader = document.getElementById(uid).parentElement.parentElement.querySelector("h5");
+                if (chartHeader) chartHeader.textContent = title;
+        
+                // create chart svg
+                createChart(type, "#" + uid, dim, group, agg, color, width * 0.9, height * 0.9);
+        
+                // add buffer margin
+                document.querySelector('#' + uid).parentElement.parentElement.style.width = (width + 30) + 'px';
+                document.querySelector('#' + uid).parentElement.parentElement.style.height = (height + 30) + 'px';
+
+                // center svg on div
+                document.querySelector('#' + uid).children[0].style.margin = "auto";
+                document.querySelector('#' + uid).children[0].style.display = "block";
+
+                window.chartConfigs = window.chartConfigs || [];
+                window.chartConfigs.push({
+                  type: type,
+                  uid: '#' + uid,
+                  dim: dim,
+                  group: group,
+                  agg: agg,
+                  color: color,
+                  width: width * 0.9,
+                  height: height * 0.9,
+                });
+            });
+        
+            document.addEventListener("click", function(e) {
+                if (e.target.classList.contains("close")) {
+                    e.target.parentElement.remove();
+                }
+            });
+        });
+  </script>
+  <script>
+   // script to export dashboard
+        document.getElementById("export-dashboard").addEventListener("click", function () {
+            const title = document.getElementById("dash_title").innerHTML;
+            const chartRowHTML = document.querySelector(".chart-row").innerHTML;
+        
+            // Get chart configuration objects (from your own logic – this may need to be adjusted if you store configs elsewhere)
+            // You should track configs in a global array when creating each chart
+            const chartConfigs = window.chartConfigs || [];
+        
+            // Embed data into the HTML as a JSON string
+            const dataString = JSON.stringify(data);
+            const configString = JSON.stringify(chartConfigs);
+        
+            const html = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <title>${title || "Dashboard"}</title>
+          <!-- Bootstrap 5 CSS & Icons -->
+          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+          <link rel="stylesheet" href="https://unpkg.com/dc@4/dist/style/dc.css">
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+        
+        </head>
+        <body>
+          <h3>${title}</h3>
+          <div class="container-fluid">
+            <div class="chart-row row m-1">
+              ${chartRowHTML}
+            </div>
+          </div>
+        
+          <\script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"><\/script>
+          <\script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"><\/script>
+          <\script src="https://d3js.org/d3.v5.min.js"><\/script>
+          <\script src="https://cdn.tutorialjinni.com/crossfilter2/1.5.2/crossfilter.min.js"><\/script>
+          <\script src="https://unpkg.com/dc@4/dist/dc.min.js"><\/script>
+          <\script>
+            const data = ${dataString};
+            const chartConfigs = ${configString};
+        
+            const ndx = crossfilter(data);
+            const all = ndx.groupAll();
+        
+            function remove_empty_bins(source_group) {
+              return {
+                all: function () {
+                  return source_group.all().filter(function (d) {
+                    return d.value !== null && d.value !== undefined && d.value !== 0;
+                  });
+                }
+              };
+            }
+        
+            function createChart(config) {
+
+              const { type, uid, dim, group, agg, color, width, height } = config;
+              var Dim = ndx.dimension(d => d[dim]);
+              var Group = (agg === "sum")
+                ? Dim.group().reduceSum(d => +d[group])
+                : Dim.group().reduceCount();
+              var nonEmptyGroup = remove_empty_bins(Group);
+        
+              if (type === "bar") {
+                dc.barChart(uid)
+                  .width(width).height(height)
+                  .x(d3.scaleBand()).xUnits(dc.units.ordinal)
+                  .brushOn(true).elasticX(true).elasticY(true)
+                  .dimension(Dim).group(nonEmptyGroup)
+                  .margins({ top: 10, left: 50, right: 50, bottom: 50 })
+                  .colors(color).xAxisLabel(dim).yAxisLabel(group)
+                  .xAxis().ticks(10);
+              } else if (type === "row") {
+                dc.rowChart(uid)
+                  .width(width).height(height)
+                  .dimension(Dim).group(nonEmptyGroup)
+                  .elasticX(true).cap(10)
+                  .ordering(d => -d.value)
+                  .margins({ top: 10, left: 50, right: 50, bottom: 50 })
+                  .colors(color).xAxis().ticks(10);
+              } else if (type === "line-ordinal") {
+                dc.lineChart(uid)
+                  .width(width).height(height)
+                  .x(d3.scaleBand()).xUnits(dc.units.ordinal)
+                  .dimension(Dim).group(nonEmptyGroup)
+                  .colors(color)
+                  .xAxisLabel(dim).yAxisLabel(group)
+                  .margins({ top: 10, left: 50, right: 50, bottom: 50 })
+                  .xAxis().ticks(10);
+              } else if (type === "line-time") {
+                const parseTime = d3.timeParse("%Y-%m-%d");
+                data.forEach(d => d.date = parseTime(d[dim]));
+                const dateDim = ndx.dimension(d => d.date);
+                const dateGroup = (agg === "sum")
+                  ? dateDim.group().reduceSum(d => +d[group])
+                  : dateDim.group().reduceCount();
+                const nonEmptyDateGroup = remove_empty_bins(dateGroup);
+                const minDate = dateDim.bottom(1)[0].date;
+                const maxDate = dateDim.top(1)[0].date;
+        
+                dc.lineChart(uid)
+                  .width(width).height(height)
+                  .x(d3.scaleTime().domain([minDate, maxDate]))
+                  .elasticY(true)
+                  .dimension(dateDim).group(nonEmptyDateGroup)
+                  .colors(color)
+                  .xAxisLabel(dim).yAxisLabel(group)
+                  .margins({ top: 10, left: 50, right: 50, bottom: 50 })
+                  .xAxis().ticks(10);
+              } else if (type === "pie") {
+                dc.pieChart(uid)
+                  .width(width).height(height)
+                  .slicesCap(10).innerRadius(100)
+                  .dimension(Dim).group(nonEmptyGroup)
+                  .on("pretransition", function (chart) {
+                    chart.selectAll("text.pie-slice").text(d =>
+                      d.data.key + " " + dc.utils.printSingleValue((d.endAngle - d.startAngle) / (2 * Math.PI) * 100) + "%"
+                    );
+                  });
+              } else if (type === "table") {
+                dc.dataTable(uid)
+                  .dimension(Group)
+                  .group(() => "").size(100)
+                  .columns([d => d.key, d => d.value])
+                  .renderlet(table => table.selectAll("tbody").classed("table table-sm", true))
+                  .order(d3.descending);
+              }
+            }
+        
+            chartConfigs.forEach(cfg => createChart(cfg));
+            dc.renderAll();
+          <\/script>
+          <style>
+              body {
+                  background-color: #efefef;
+                  margin: 0;
+              }
+              g .x.axis text,
+              g .axis text {
+                  text-anchor: end !important;
+                  transform: rotate(-45deg);
+              }
+              .dc-chart g.row rect {
+                  width: revert-layer !important;
+                  max-width: none !important;
+                  flex-shrink: 1 !important;
+              }
+              .dc-chart g.row text,
+              .dc-chart .pie-slice {
+                  fill: black;
+                  color: black;
+              }
+              .dc-chart tbody {
+                  border: solid 1px;
+              }
+              #close {
+                  float: right;
+                  display: inline-block;
+                  padding: 2px 5px;
+              }
+              .close:hover {
+                  cursor: pointer;
+              }
+              #dash_title {
+                  text-align: center;
+              }
+          </style>
+        
+        </body>
+        </html>
+        `;
+        
+            const blob = new Blob([html], { type: "text/html" });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "dashboard.html";
+            a.click();
+        });
+  </script>
+ </body>
+</html>

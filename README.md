@@ -12,30 +12,24 @@
 
 ### Interactive dashboards
 
-A quick and easy way to create interactive dashboards offline. Powered by D3.js
-and Crossfilter.js
+A quick and easy way to create interactive dashboards offline. Powered by D3.js, dc.js and Crossfilter.js.
 
 ## Requirements and dependencies
 
 #### Javascript
 * Bootstrap 4
-* JQuery 3.4
 * dc.js 4
 * d3.js 5
 * crossfilter.js 1.5
-
-#### Python
-* pandas
-* [eel](https://github.com/samuelhwilliams/Eel)
 
 ## Current features
 
 * Bar charts
 * Row charts
-* Line charts (ordinal & time)
+* Line charts
 * Pie charts
 * Tables
-* Allows to load and join two different csv files for comparison.
+* Export dashboard to single html, preserving functionalities.
 
 ## Usage
 
@@ -44,8 +38,7 @@ and Crossfilter.js
 3. Configure the chart element.
 
 ## Screenshots
-![dataProfiler](images/image1.png)
-![dataProfiler](images/image2.png)
+![dataProfiler](images/screenshot.png)
 
 
 
